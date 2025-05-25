@@ -39,7 +39,7 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    public List<Booking> getBookingByUser(UUID userId){
+    public List<Booking> getBookingByUser(String userId){
         return bookingRepository.findByUserId(userId);
     }
 

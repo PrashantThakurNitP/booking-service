@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 public class CreateBookingRequest {
     @NotNull
-    private UUID userId;
+    private String userId;
     @NotNull
     private UUID roomId;
     @NotNull

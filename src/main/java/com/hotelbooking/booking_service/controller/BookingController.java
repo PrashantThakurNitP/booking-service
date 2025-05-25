@@ -5,8 +5,10 @@ import com.hotelbooking.booking_service.entity.Booking;
 import com.hotelbooking.booking_service.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
+@Slf4j
 public class BookingController {
     private final BookingService bookingService;
 
@@ -28,7 +31,14 @@ public class BookingController {
        return ResponseEntity.ok(bookingService.getBooking(bookingId));
     }
     @GetMapping("/user/{userId}")
-    ResponseEntity<List<Booking>> getBookingForUser(@PathVariable UUID userId){
+    ResponseEntity<List<Booking>> getBookingForUser(@PathVariable String userId){
         return ResponseEntity.ok(bookingService.getBookingByUser(userId));
     }
+    @GetMapping("/my")
+    public ResponseEntity<List<Booking>> getMyBookings(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        log.info("User id {}",userId);
+        return ResponseEntity.ok(bookingService.getBookingByUser(userId));
+    }
+
 }

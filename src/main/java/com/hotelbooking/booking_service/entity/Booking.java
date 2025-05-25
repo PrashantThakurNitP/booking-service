@@ -16,7 +16,7 @@ public class Booking {
     @Id
     private UUID id;
 
-    private UUID userId;
+    private String userId;
     private UUID roomId;
 
     private LocalDate checkIn;
