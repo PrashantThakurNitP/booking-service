@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 public class BookingEvent {
     private UUID bookingId;
-    private UUID userId;
+    private String userId;
     private UUID roomId;
     private LocalDate checkIn;
     private LocalDate checkOut;

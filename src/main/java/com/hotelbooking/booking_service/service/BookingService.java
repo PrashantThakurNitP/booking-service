@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ public class BookingService {
         booking.setStatus(BookingStatus.PENDING);
         BookingEvent bookingEvent = BookingEvent.builder()
                 .bookingId(booking.getId())
+                .userId(booking.getUserId())
                 .roomId(booking.getRoomId())
                 .roomId(booking.getRoomId())
                 .checkIn(booking.getCheckIn())
@@ -46,5 +48,29 @@ public class BookingService {
     public Booking getBooking(UUID bookingId){
         return bookingRepository.findById(bookingId)
                 .orElseThrow(()->new EntityNotFoundException("Booking Not Found"));
+    }
+
+    public Booking cancelBooking(UUID bookingId, String userId) throws AccessDeniedException {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(()-> new EntityNotFoundException("Booking Not Found"));
+        if(!booking.getUserId().equals(userId)){
+            throw new AccessDeniedException("You are not authorized to cancel this booking");
+        }
+        if(booking.getStatus().equals(BookingStatus.CANCELLED)){
+            throw new IllegalStateException("Booking is already cancelled");
+        }
+        booking.setStatus(BookingStatus.CANCELLED);
+        BookingEvent event = BookingEvent.builder()
+                .bookingId(booking.getId())
+                .userId(booking.getUserId())
+                .roomId(booking.getRoomId())
+                .checkIn(booking.getCheckIn())
+                .checkOut(booking.getCheckOut())
+                .status(booking.getStatus().name())
+                .build();
+
+
+        bookingEventProducer.sendBookingEvent(event);
+        return  bookingRepository.save(booking);
     }
 }
