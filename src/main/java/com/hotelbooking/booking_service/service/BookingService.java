@@ -8,6 +8,7 @@ import com.hotelbooking.booking_service.kafka.BookingEventProducer;
 import com.hotelbooking.booking_service.repository.BookingRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -16,11 +17,17 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingService {
     private final BookingRepository bookingRepository;
    private final BookingEventProducer bookingEventProducer;
+   private final RoomAvailabilityHashBasedService roomAvailabilityService;
 
     public Booking createBooking(CreateBookingRequest bookingRequest){
+        if(!roomAvailabilityService.isAvailable(bookingRequest.getRoomId(), bookingRequest.getCheckIn(), bookingRequest.getCheckOut())){
+            throw new IllegalStateException("Room is unavailable");
+        }
+        log.info("Room is available");
         Booking booking = new Booking();
         booking.setId(UUID.randomUUID());
         booking.setUserId(bookingRequest.getUserId());
@@ -38,6 +45,7 @@ public class BookingService {
                 .status(booking.getStatus().name())
                 .build();
         bookingEventProducer.sendBookingEvent(bookingEvent);
+        roomAvailabilityService.markAsBooked(bookingRequest.getRoomId(), bookingRequest.getCheckIn(), bookingRequest.getCheckOut());
         return bookingRepository.save(booking);
     }
 
@@ -69,8 +77,8 @@ public class BookingService {
                 .status(booking.getStatus().name())
                 .build();
 
-
         bookingEventProducer.sendBookingEvent(event);
+        roomAvailabilityService.cancelBooking(booking.getRoomId(), booking.getCheckIn(), booking.getCheckOut());
         return  bookingRepository.save(booking);
     }
 }
