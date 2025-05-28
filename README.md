@@ -1,9 +1,3 @@
-
----
-
-### 📁 `booking-service/README.md`
-
-```markdown
 # Booking Service
 
 ## 📅 Overview
