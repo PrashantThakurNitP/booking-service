@@ -3,9 +3,9 @@ package com.hotelbooking.booking_service.service;
 import com.hotelbooking.booking_service.dto.CreateBookingRequest;
 import com.hotelbooking.booking_service.entity.Booking;
 import com.hotelbooking.booking_service.entity.BookingStatus;
-import com.hotelbooking.booking_service.kafka.BookingEvent;
 import com.hotelbooking.booking_service.kafka.BookingEventProducer;
 import com.hotelbooking.booking_service.repository.BookingRepository;
+import com.hotelbooking.common.event.BookingEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class BookingService {
-    private final BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository; // final just helps enforce constructor injection.
    private final BookingEventProducer bookingEventProducer;
    private final RoomAvailabilityHashBasedService roomAvailabilityService;
 
@@ -38,7 +38,6 @@ public class BookingService {
         BookingEvent bookingEvent = BookingEvent.builder()
                 .bookingId(booking.getId())
                 .userId(booking.getUserId())
-                .roomId(booking.getRoomId())
                 .roomId(booking.getRoomId())
                 .checkIn(booking.getCheckIn())
                 .checkOut(booking.getCheckOut())

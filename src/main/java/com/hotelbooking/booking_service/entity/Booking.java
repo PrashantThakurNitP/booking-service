@@ -22,7 +22,7 @@ public class Booking {
     private LocalDate checkIn;
     private LocalDate checkOut;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private BookingStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
