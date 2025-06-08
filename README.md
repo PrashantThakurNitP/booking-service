@@ -71,3 +71,18 @@ docker run -it --rm \
 --network="host" \
 bitnami/kafka:latest \
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic booking-events --from-beginning
+
+
+Query to change enum type
+
+UPDATE bookings
+SET status = 'PENDING'
+WHERE status = '0';
+
+UPDATE bookings
+SET status = 'CONFIRMED'
+WHERE status = '1';
+
+UPDATE bookings
+SET status = 'REJECTED'
+WHERE status = '2';
